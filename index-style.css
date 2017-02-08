@@ -1,6 +1,45 @@
-body {
-        background-color: indigo;
-        font-size: 28px;
-        font-family: Helvetica;
+
+html{
+}
+
+
+#content {
+        width: 80%;
+        height: 100%;
+        text-align: center;
+        margin: auto;
+        background-color: #7FDBFF;
+        padding-bottom: 10px;
+                border: 2px solid #001f3f;
+
+}
+
+#content h1 {
+        color: #001f3f
+}
+
+/* consulted https://css-tricks.com/using-css-for-image-borders/ */
+#content img {
+        width: 90%;
+        height: 90%;
+        border: 2px solid #001f3f;
+}
+
+/* consulted http://www.w3schools.com/Css/css3_buttons.asp */
+.button {
+        background-color: #AAAAAA; 
+        border: none;
         color: white;
+        padding: 10px 10px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 20px;
+        border: 1px solid #001f3f;
+
+}
+
+a {
+        color: #001f3f;
+        text-decoration: none;
 }

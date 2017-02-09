@@ -1,8 +1,8 @@
 
-html{
+body {
+    background-image: url("cookie-clicker-background");
+    font-family: "Times New Roman", Times, serif;
 }
-
-
 #content {
         width: 80%;
         height: 100%;
@@ -10,7 +10,8 @@ html{
         margin: auto;
         background-color: #7FDBFF;
         padding-bottom: 10px;
-                border: 2px solid #001f3f;
+        border: 2px solid #001f3f;
+        border-radius: 10px;
 
 }
 
@@ -23,11 +24,12 @@ html{
         width: 90%;
         height: 90%;
         border: 2px solid #001f3f;
+        border-radius: 10px
 }
 
 /* consulted http://www.w3schools.com/Css/css3_buttons.asp */
 .button {
-        background-color: #AAAAAA; 
+        background-color: #FFFFFF; 
         border: none;
         color: white;
         padding: 10px 10px;
@@ -35,8 +37,13 @@ html{
         text-decoration: none;
         display: inline-block;
         font-size: 20px;
-        border: 1px solid #001f3f;
+        border: 2px solid #001f3f;
+        border-radius: 5px;
 
+}
+
+.button :hover {
+    font-weight: bold;
 }
 
 a {

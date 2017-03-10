@@ -13,6 +13,7 @@
 
         <h1>Jacob Jaffe</h1>
         <p><img src="jacob-lake-photo.jpg" alt="Jacob" /></p>
+        </div>
         <div class = "button">
         <a href="resume.html"> Resume </a>
         </div>

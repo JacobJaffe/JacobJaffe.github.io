@@ -1,8 +1,3 @@
-/* TODO */
-// Have each ball have a set of potential notes, initialized from start
-// to stop the crackling (BUT THEN NOT DYNAMICALLy ALLOCATED?!??!?)
-// weigh those pros and cons later
-
 
 /* create and initialize a new ball  */
 function newBall (xStart, yStart, dxStart, dyStart, rStart, colorStart, wave)
@@ -16,6 +11,8 @@ function newBall (xStart, yStart, dxStart, dyStart, rStart, colorStart, wave)
         r: rStart,
         color: colorStart,
         keyPress: -1,
+        osc: null,
+        gainNode : null,
         freq: null,
         wave: wave,
         volume: rStart / 5,
@@ -24,62 +21,12 @@ function newBall (xStart, yStart, dxStart, dyStart, rStart, colorStart, wave)
     return ball;
 }
 
-let activeNotes = [];
-
-var masterGain;
-
-function addActiveNote(i, ball)
-{   
-    areNotesPlaying = true;
-    if (activeNotes[currentScale][i][ball.keyPress] == null) {
-        activeNotes[currentScale][i][ball.keyPress] = (OscGainPair(ball));
-    } else {
-        activeNotes[currentScale][i][ball.keyPress].pressed = true;
-        activeNotes[currentScale][i][ball.keyPress].gainNode.gain.value = ball.volume;
-    }
-    
-    function OscGainPair(ball) 
-    {
-        var gainNode = audioContext.createGain();
-        gainNode.gain.value = ball.volume;
-        gainNode.connect(masterGain);
-        var osc = audioContext.createOscillator();
-        osc.connect(gainNode);
-        osc.type = ball.wave;
-        console.log(ball.freq);
-        osc.frequency.value = ball.freq;
-        osc.start();
-        return {
-            osc: osc,
-            gainNode: gainNode,
-            pressed: true
-        }
-    }
-}
-
-var areNotesPlaying = false;
-
-function dampenActiveNotes()
-{
-    for (var s = 0; s < scales.length; s ++) {
-    for (var i = 0; i < balls.length; i++) {
-            for (var j = 0; j < activeNotes[s][i].length; j++) {
-                if (activeNotes[s][i][j] != null) {
-                    activeNotes[s][i][j].gainNode.gain.value -= 0.1;
-                    if (activeNotes[s][i][j].gainNode.gain.value <= 0) {
-                        activeNotes[s][i][j].gainNode.gain.value = 0;
-                    }
-                }
-            }
-        }
-    }
-}
 
 
 var canvas = document.getElementById("myCanvas");
 var context = canvas.getContext("2d");
 var containerR;
-var rotationSpeed = 0;
+var rotationSpeed = 1;
 
 
 function resizeBoundry()
@@ -99,18 +46,15 @@ resizeBoundry();
 var balls =
 [
     
-//    newBall(canvas.width / 3, canvas.height / 7, -4, 4, 20, "red", "sine"),
+    newBall(canvas.width / 3, canvas.height / 7, -4, 4, 20, "red", "sine"),
 //    newBall(canvas.width / 3, canvas.height / 7, 4, -4, 20, "green", "sine"),
-
-    newBall(canvas.width / 3, canvas.height / 5, 2, -15, 10, "purple", "sine"),
-    newBall(canvas.width / 3, canvas.height / 5, -2, 15, 10, "orange", "sine"),
-    newBall(canvas.width / 2, canvas.height / 5, -3, 8, 30, "teal", "sine"), 
+//
+//    newBall(canvas.width / 3, canvas.height / 5, 2, -15, 10, "purple", "sine"),
+//    newBall(canvas.width / 3, canvas.height / 5, -2, 15, 10, "orange", "sine"),
+//    newBall(canvas.width / 2, canvas.height / 5, -3, 8, 30, "teal", "sine"), 
     
 
 ];
-
-var playing = true;
-var speedDecay = true;
 
 function draw() 
 {
@@ -125,10 +69,6 @@ function draw()
         context.fillStyle = currentBall.color;
         context.fill();
         context.closePath();
-        
-        if (mousedown) {
-           moveBallToCurser(balls[i]); 
-        }
         
         currentBall.x    += currentBall.dx;
         currentBall.y    += currentBall.dy;
@@ -153,26 +93,22 @@ function draw()
             currentBall.dx = -v * Math.cos(newAngle);
             currentBall.dy = v * Math.sin(newAngle);
             
-            addActiveNote(i, playNote(currentBall));
+
+            playNote(currentBall);
 
         }
         
        
     }
-    if (areNotesPlaying) {
-        dampenActiveNotes();
-    }
     frame++;
-    if (playing) {
-        requestAnimationFrame(draw);
-    }
+    requestAnimationFrame(draw);
 }
 
 
 var segmentDepth = 20;
 
-// default number of notes
-var notes = 8;
+// number of notes
+var notes = 16;
 
 // divide degrees by notes
 var segmentWidth = 360 / notes;
@@ -223,10 +159,14 @@ function playNote(ball)
     rounded_degree_angle = rounded_degree_angle % 360
     
     ball.keyPress = (notes - 1 - (rounded_degree_angle / 360) * notes);
+    if(ball.osc != null) {
+        ball.osc.disconnect();
+    }
     
+    ball.gainNode.gain.value = ball.volume;
     ball.freq = key[ball.keyPress];
     adjustOctave(ball);
-    return ball;
+    playTone(ball);  
 }
 
 draw();
@@ -347,39 +287,49 @@ var GMajor;
 var GMajor7Chord;
 var DMinor7Chord;
 var AMinor7Chord;
-var scales = [];
 
-var key;
-var currentScale = 1;
+var key = new Array();
 
 function setUpMusic()
 {
     console.log("Setting up music!");
-    
     noteFreq = createNoteTable();
-    
+
     CMajor = majorKey(5, 1);
     CMajor7Chord = Major7Scale(4,1);
     GMajor = majorKey(4, 8)
     GMajor7Chord = Major7Scale(4, 8);
     DMinor7Chord = Minor7Scale(4, 3);
     AMinor7Chord = Minor7Scale(4, 10);
-    scales.push(CMajor7Chord, DMinor7Chord, AMinor7Chord, GMajor7Chord);
+    
+    
+    for (var i = 0; i < balls.length; i++) {
+            balls[i].gainNode = audioContext.createGain(),
+            balls[i].gainNode.connect(audioContext.destination);
+            balls[i].gainNode.gain.value = balls[i].volume
+    }
     
     /* initialize */
     key = DMinor7Chord;
     keySignature = document.getElementById("keySignature");
     keySignature.innerHTML = "<p>d minor7</p>"
-   
-    for (var j = 0; j < scales.length; j++) {
-        activeNotes[j] = [];
-        for (var i = 0; i< balls.length; i++) {
-            activeNotes[j][i] = [];
-        }
+
+}
+
+function keyChange()
+{
+    keySignature = document.getElementById("keySignature");
+    if (key == CMajor7Chord) {
+        key = DMinor7Chord;
+        keySignature.innerHTML = "<p>d minor7</p>"
+    } else if (key == GMajor7Chord) {
+        key = CMajor7Chord;
+        keySignature.innerHTML = "<p>C Major7</p>"
+    } else if (key == DMinor7Chord) {
+        key = GMajor7Chord;
+        keySignature.innerHTML = "<p>G Major7</p>"
+
     }
-    
-    masterGain = audioContext.createGain();
-    masterGain.connect(audioContext.destination);
 }
 
 function button_CM7()
@@ -387,7 +337,6 @@ function button_CM7()
     keySignature = document.getElementById("keySignature");
     keySignature.innerHTML = "<p>C Major7</p>";
     key = CMajor7Chord;
-    currentScale = 0;
 }
 
 function button_GM7()
@@ -395,7 +344,6 @@ function button_GM7()
     keySignature = document.getElementById("keySignature");
     keySignature.innerHTML = "<p>G Major7</p>";
     key = GMajor7Chord;
-    currentScale = 3;
 }
 
 function button_dm7()
@@ -403,7 +351,6 @@ function button_dm7()
     keySignature = document.getElementById("keySignature");
     keySignature.innerHTML = "<p>d minor7</p>";
     key = DMinor7Chord;
-    currentScale = 1;
 }
 
 function button_am7()
@@ -411,7 +358,6 @@ function button_am7()
     keySignature = document.getElementById("keySignature");
     keySignature.innerHTML = "<p>d minor7</p>";
     key = AMinor7Chord;
-    currentScale = 2;
 }
 
 function button_BbBlues()
@@ -495,23 +441,6 @@ function Minor7Scale(octave, note)
     return scale;
 }
 
-function addScaleDegrees(scale)
-{
-    while (scale.length < notes) {
-        for (var k = 0; k < 4; k++) {
-        scale.push(scale[k] * 2);
-        }
-    }
-    return scale;
-}
-
-function updateScales()
-{
-    for (var i = 0; i < scales.length; i++) {
-        addScaleDegrees(scales[i]);
-    }
-}
-
 function adjustOctave(ball)
 {
     if (ball.r > 10) {
@@ -523,109 +452,19 @@ function adjustOctave(ball)
 }
 
 
+function playTone(ball) {
+  osc = audioContext.createOscillator();
+  osc.connect(ball.gainNode);
+  osc.type = ball.wave;
+  osc.frequency.value = ball.freq;
+  osc.start();
+  ball.osc = osc;
+    ball.osc.frequency.value = ball.freq;
+}
+
 function rotationSpeedSlider(speed)
 {
     rotationSpeed = speed;
 }
 
-function randomizeBalls()
-{
-    var range = containerR * 0.8
-    for (var i = 0; i < balls.length; i ++) {
-        do {
-            balls[i].x = (containerR) + Math.random() * (range) - 
-                    Math.random() * range;
-            balls[i].y = (containerR) + Math.random() * (range) - 
-                    Math.random() * range;
-            balls[i].dx = (Math.random() * containerR/5) - containerR/10;
-            balls[i].dy = (Math.random() * containerR/5) - containerR/10
-        } while ((Math.pow(balls[i].x, 2) + Math.pow(balls[i].y, 2)) <          
-                    (containerR - 15));
-    }
-}
 
-
-function numNotesSlider(power)
-{
-    notes = Math.pow(2, power);
-    segmentWidth = 360 / notes;
-    updateScales();
-}
-
-function pause()
-{
-    playing = !playing;
-    if(playing == true) {
-        masterGain.gain.value = 1;
-        draw();
-    } else {
-        masterGain.gain.value = 0;
-    }
-}
-
-
-function setup()
-{
-    setUpMusic();
-    setupMouse();
-}
-
-function setupMouse()
-{
-    canvas.addEventListener("mousedown", doMouseDown, false);
-    canvas.addEventListener("mousemove", doMouseMove, false);
-    canvas.addEventListener("mouseup", doMouseUp, false);
-}
-
-var mousedown = false;
-
-function doMouseDown(event) {
-    mousedown = true;
-}
-
-function doMouseUp(event) {
-    mousedown = false;
-}
-
-var mouseX;
-var mouseY;
-
-function doMouseMove(event) {
-    mouseX = event.pageX;
-    mouseY = event.pageY;
-}
-
-var orbitRadius = 20;
-
-function moveBallToCurser(ball) {
-    ballToCurser = Math.pow((mouseX - ball.x), 2) + 
-            Math.pow((mouseX - ball.x), 2);
-    if (ballToCurser <= orbitRadius) {
-        orbitCurser(ball);
-    }else {
-    aceleration = (Math.log(ballToCurser)) * 0.02;
-    ball.x > mouseX ? ball.dx -= aceleration : ball.dx += aceleration;
-    ball.y > mouseY ? ball.dy -= aceleration : ball.dy += aceleration;
-    }
-
-}
-
-function orbitCurser(ball) {
-    if (ball.dx > ball.r/10) {
-        ball.dx -= 0.4;
-    } else if (ball.dx < -ball.r/10) {
-        ball.dx += 0.4;
-    }
-    if (ball.dy > ball.r/10 ) {
-        ball.dy -= 0.4;
-    } else if (ball.dy < -ball.r/10) {
-        ball.dy += 0.4;
-    }
-}
-
-function tractorBeem(ball)
-{
-    if ((ball.dx > 0) && (mouse.X - ball.x > 0)) {
-        ball.dx += 0.3;
-    }
-}

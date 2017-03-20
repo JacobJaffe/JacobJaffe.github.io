@@ -1,53 +1,105 @@
+/* reset styling */
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td{
+    margin:0;
+    padding:0;
+}
 
-body {
+
+html, body {
     width: 100%;
-    height: auto;
+    height: 100%;
+}
+
+div {
+    display: block;
+}
+
+#wrapper {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
     background-color: white;
-    font-family: "Times New Roman", Times, serif;
-}
-#content {
-        width: 80%;
-        text-align: center;
-        margin: auto;
-        padding-bottom: 10px;
 }
 
-#content h1 {
-        color: #001f3f;
-    
+/****************************
+  INFO BAR
+ ****************************/
+#topBar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 48px;
+    color: #404040;
+    background-color: #f9f9f9;
 }
 
-/* consulted https://css-tricks.com/using-css-for-image-borders/ */
-#content img {
-        width: 90%;
-        height: 90%;
-        max-width: 632px;
-        max-height: inherit;
-        border: 2px solid #001f3f;
-        padding: 1px;
-        border-radius: 2px
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid #e7e7e7;
 }
 
-/* consulted http://www.w3schools.com/Css/css3_buttons.asp */
-.button {
-        background-color: #FFFFFF; 
-        border: none;
-        color: white;
-        padding: 10px 10px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 20px;
-        border: 2px solid #001f3f;
-        border-radius: 2px;
-        width: 20%;
+li {
+    float: left;
 }
 
-.button :hover {
-    font-weight: bold;
+li a {
+    display: inline-block;
+    color: inherit;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    border-right: 1px solid #e7e7e7;
 }
 
-a {
-        color: #001f3f;
-        text-decoration: none;
+a:hover {
+    background-color: #d5d5d5;
 }
+
+/****************************
+        Content
+ ****************************/
+
+#content{
+    position: absolute;
+    left: 0;
+    top: 48px;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    background-color: #f9f9f9;
+}
+
+#content > div {
+    border: 1px solid #e7e7e7;
+    border-radius: 4px;
+    margin: 2px;
+}
+
+
+#canvas-container {
+    position: absolute;
+    left: 0px;    /* acounts for the overflow-y scroll */
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: #d5d5d5;
+    overflow: hidden;
+}
+
+
+#myCanvas {
+    positon: absolute;
+    align-self: center;
+    background: #d5d5d5;
+}
+
+
+

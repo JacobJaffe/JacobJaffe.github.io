@@ -36,7 +36,7 @@ function draw() {
     context.clearRect(0, 0, canvas.width, canvas.height); /* clears previous frame */
     resizeCanvas();
     animatedTyping("Hello World", dt);
-    drawKeyboard();
+    // drawKeyboard();
     requestAnimationFrame(draw);
 }
 

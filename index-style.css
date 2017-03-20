@@ -61,7 +61,10 @@ li a {
 
 a:hover {
     background-color: #d5d5d5;
+    cursor: pointer;
 }
+
+
 
 /****************************
         Content

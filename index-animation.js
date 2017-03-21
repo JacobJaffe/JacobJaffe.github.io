@@ -52,6 +52,7 @@ function setFont(ratio) {
     fontSize = canvas.width * ratio;
     context.font = (fontSize|0) + 'px Courier New'; // set font
     context.textAlign = "center";
+
 }
 
 var waitTime = 1; /* wait three seconds initially for animation to start */
@@ -91,7 +92,6 @@ function animatedTyping(text, dt) {
     if (y < fontSize ){
         y = fontSize ;
     }
-    context.fillStyle = "rgb(0, 255,0)";
     context.fillText(currentString, x, y);
 }
 
@@ -115,13 +115,14 @@ function nextMessage() {
 }
 
 function setupMessages() {
-    messages.push("SUPER CYPHER");
+    messages.push("Hello World");
+    messages.push("I'm Jacob");
     currentMessage = 0;
 }
 
 
 /***************
-    Abstraction Barrier: Keyboard:
+ Abstraction Barrier: Keyboard:
  *****************/
 
 var keys = [];
@@ -131,8 +132,8 @@ function Key(char, col, row) {
     this.col = col;
     this.row = row;
     this.pressed = false;
-    this.strokeStyle = "rgb(0, 255, 0)";
-    this.fillStyle = "black";
+    this.strokeStyle = "black";
+    this.fillStyle = "#f9f9f9";
     this.timeAsColor = 0; /* for animation */
 }
 
@@ -161,12 +162,12 @@ Key.prototype.pressedStyle = function() {
     if (this.timeAsColor >= 1) {
         this.pressed = false;
         this.timeAsColor = 0;
-        this.fillStyle = "black";
-        this.strokeStyle = "rgb(0,255,0)";
+        this.fillStyle = "#f9f9f9";
+        this.strokeStyle = "black";
     } else {
         // this.strokeStyle = "rgb(255,"  + 0 + "," + 0 + ")"
         var fade = Math.floor(this.timeAsColor * 255);
-        this.fillStyle = "rgb(0," + (255 - fade) + ",0)";
+        this.fillStyle = "rgb(255,"  + fade + "," + fade + ")";
 
     }
 

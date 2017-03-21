@@ -101,7 +101,7 @@ a:hover {
 #myCanvas {
     positon: absolute;
     align-self: center;
-    background: black;
+    background: #f9f9f9;
 }
 
 #project-list {

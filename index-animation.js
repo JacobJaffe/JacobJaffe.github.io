@@ -11,6 +11,7 @@ function init() {
     startTime = new Date();
     setupGraphics();
     setupKeyboard();
+    setupMessages();
     window.requestAnimationFrame(draw);
 }
 
@@ -29,7 +30,8 @@ function resizeCanvas() {
     setFont(fontRatio);
 }
 
-var message = "Hello World";
+var messages = [];
+var currentMessage;
 
 /* draw each frame of animation */
 function draw() {
@@ -38,7 +40,7 @@ function draw() {
     time = now;
     context.clearRect(0, 0, canvas.width, canvas.height); /* clears previous frame */
     resizeCanvas();
-    animatedTyping(message, dt);
+    animatedTyping(messages[currentMessage], dt);
     drawKeyboard(dt);
     requestAnimationFrame(draw);
 }
@@ -50,7 +52,6 @@ function setFont(ratio) {
     fontSize = canvas.width * ratio;
     context.font = (fontSize|0) + 'px Courier New'; // set font
     context.textAlign = "center";
-
 }
 
 var waitTime = 1; /* wait three seconds initially for animation to start */
@@ -68,8 +69,7 @@ function animatedTyping(text, dt) {
         }
         if (currentChar > charArray.length) {
             if (currentChar > charArray.length * 2) {
-                currentChar = -1; /* for the ++ at end of function */
-                waitTime = 1;
+                nextMessage();
             } else {
                 backwardsTyping();
             }
@@ -77,7 +77,8 @@ function animatedTyping(text, dt) {
         if (currentChar == charArray.length) {
             waitTime = 1;
         }
-        if (charArray[currentChar] in keys) {
+        /* first check not undefined, i.e. not a valid array address, then check if key is in map */
+        if (charArray[currentChar] && charArray[currentChar].toLocaleLowerCase() in keys) {
             keys[charArray[currentChar].toLocaleLowerCase()].pressed = true;
             keys[charArray[currentChar].toLocaleLowerCase()].timeAsColor = 0;
         }
@@ -90,6 +91,7 @@ function animatedTyping(text, dt) {
     if (y < fontSize ){
         y = fontSize ;
     }
+    context.fillStyle = "rgb(0, 255,0)";
     context.fillText(currentString, x, y);
 }
 
@@ -103,6 +105,25 @@ function backwardsTyping() {
     currentString = currentString.slice(0, -1);
 }
 
+function nextMessage() {
+    currentMessage++;
+    if (currentMessage == messages.length) {
+        currentMessage = 0;
+    }
+    currentChar = -1; /* for the ++ at end of function */
+    waitTime = 1;
+}
+
+function setupMessages() {
+    messages.push("SUPER CYPHER");
+    currentMessage = 0;
+}
+
+
+/***************
+    Abstraction Barrier: Keyboard:
+ *****************/
+
 var keys = [];
 
 function Key(char, col, row) {
@@ -110,8 +131,8 @@ function Key(char, col, row) {
     this.col = col;
     this.row = row;
     this.pressed = false;
-    this.strokeStyle = "black";
-    this.fillStyle = "white";
+    this.strokeStyle = "rgb(0, 255, 0)";
+    this.fillStyle = "black";
     this.timeAsColor = 0; /* for animation */
 }
 
@@ -138,15 +159,14 @@ Key.prototype.draw = function() {
 /* compute the fade of the pressed key */
 Key.prototype.pressedStyle = function() {
     if (this.timeAsColor >= 1) {
-        console.log("reset 'em!");
         this.pressed = false;
         this.timeAsColor = 0;
-        this.fillStyle = "white";
-        this.strokeStyle = "black";
+        this.fillStyle = "black";
+        this.strokeStyle = "rgb(0,255,0)";
     } else {
         // this.strokeStyle = "rgb(255,"  + 0 + "," + 0 + ")"
         var fade = Math.floor(this.timeAsColor * 255);
-        this.fillStyle = "rgb(255,"  + fade + "," + fade + ")";
+        this.fillStyle = "rgb(0," + (255 - fade) + ",0)";
 
     }
 
@@ -227,12 +247,12 @@ function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
     if (stroke) {
         ctx.stroke();
     }
-
 }
 
-function comingSoon() {
+/* TODO: eventually not need this! */
+function comingSoon(text) {
     currentChar = charArray.length * 2;
     currentString = '';
     waitTime = 0;
-    message = "Coming Soon!";
+    message = text + " Coming Soon!";
 }

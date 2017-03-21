@@ -1,0 +1,56 @@
+<!doctype html>
+
+<html>
+<head>
+    <meta charset ="utf-8"/>
+    <link href="index-style.css" rel="stylesheet" />
+    <title>Projects</title>
+</head>
+
+<body>
+
+<div id = "wrapper">
+    <div id = "topBar">
+        <ul>
+            <li><a href="index.html">Jacob Jaffe</a></li>
+            <li><a onclick = "comingSoon('Bio');">Bio</a></li>
+            <li><a href ="projects.html">Projects</a></li>
+            <li><a href="resume.pdf">Resume</a></li>
+            <li><a onclick = "comingSoon('Contact');">Contact</a></li>
+        </ul>
+    </div>
+    <div id = "content">
+        <div id = "project-list">
+            <div class = "project">
+                <div class = "left">
+                    <h1>Musical Shapes</h1>
+                    <p>A project exploring connections between music and geometry. </p>
+                    <p>Try <a href="Music-Geometry/V1.0/">V1.0</a> for a working proof of concept, using the Web Audio API for frequency oscillations!</p>
+                    <p>Try the <a href="Music-Geometry/V2.0/">beta</a> for a glimpse at what this project has in store, especially its focus on complete modularity.</p>
+                </div>
+                <div class = "right">
+                    <a href="Music-Geometry/V1.0/"><img src="MusicalShapesV1.0.gif" alt="V1.0" title="V1.0"/></a>
+                    <a href="Music-Geometry/V2.0/"><img src="MusicalShapesV2.0.gif" alt="Beta" title="Beta"/></a>
+                </div>
+                </div>
+            <div class = "project">
+                <div class = "left">
+                    <h1>Super Cypher</h1>
+                    <p>A collaboration project, Super Cypher is a two-player game in which you attempt to unscramble your
+                        own keyboard, while thwarting your opponents efforts to unscramble their own!</p>
+                    <p>Super Cypher is built on Node.js and Sockets, and is currently in early stages.</p>
+                    <p>Stay tuned for updates!</p>
+                </div>
+                <div class = "right">
+                    <img id = "no-click" src = "SuperCypher.gif" alt="Super Cypher" title = "Super Cypher"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+<footer>
+    <script src="index-animation.js"></script>
+</footer>
+</html>

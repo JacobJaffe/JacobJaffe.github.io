@@ -257,3 +257,6 @@ function comingSoon(text) {
     waitTime = 0;
     message = text + " Coming Soon!";
 }
+
+
+

@@ -124,6 +124,15 @@ a:hover {
     border-radius: 4px;
 }
 
+#bio-content {
+    position: absolute;
+    left: 0px;    /* acounts for the overflow-y scroll */
+    right: 0;
+    top: 0;
+    bottom: 0;
+    text-align: center;
+}
+
 h1 {
     text-align: center;
 }
@@ -142,7 +151,6 @@ p {
     padding: 10px;
     box-sizing: border-box;
     margin-right: 1%;
-    border-right: 1px solid #e7e7e7;
 }
 
 .project .right {
